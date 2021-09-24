@@ -1,0 +1,29 @@
+---
+name: Tests
+on: push
+jobs:
+  tests:
+    env:
+      JRUBY_OPTS: "--dev -J-Xmx1800M"
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      matrix:
+        experimental: [false]
+        ruby:
+          - "2.5"
+          - "2.6"
+          - "2.7"
+          - "3.0"
+        include:
+          - experimental: true
+            ruby: "jruby"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: none
+      - run: rake fixtures
+      - run: bin/setup
+      - run: bin/rake
